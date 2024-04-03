@@ -1,6 +1,6 @@
 import pygame
 import settings
-
+#Test
 class Ball(pygame.sprite.Sprite):
 
     BALL_SIZE = 7
