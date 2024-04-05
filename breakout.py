@@ -1,10 +1,11 @@
 import pygame
 import random
+import settings
 from paddle import Paddle
-from brick import Brick
+from brick import Brick, HardBrick
 from ball import Ball
 from counter import Counter
-import settings
+
 
 # Initialize the PyGame
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -16,16 +17,17 @@ pygame.display.set_caption("Breakout")
 
 # Clock setup
 clock = pygame.time.Clock()
-FPS = 60 
+FPS = 60
 
 # Colors
-BLACK = pygame.Color(0,0,0)
-WHITE = pygame.Color("#cccccc")
-RED = pygame.Color("#a31e0a")
-ORANGE = pygame.Color("#ba7f0a")
-GREEN = pygame.Color("#0a8533")
-YELLOW = pygame.Color("#c2c229")
-BLUE = pygame.Color("#0a85c2")
+BLACK = pygame.Color("black")
+WHITE = pygame.Color("snow")
+RED = pygame.Color("red4")
+ORANGE = pygame.Color("coral")
+GREEN = pygame.Color("green")
+YELLOW = pygame.Color("yellow")
+BLUE = pygame.Color("skyblue1")
+PINK = pygame.Color("hotpink4")
 
 # Fonts
 MESSAGE_FONT = pygame.font.Font("squarefont.ttf", 50)
@@ -45,31 +47,42 @@ BRICK_TOP = 100
 
 ROW_COLORS = [RED, RED, ORANGE, ORANGE, GREEN, GREEN, YELLOW, YELLOW]
 
+HARD_BRICK_COLOR = PINK
+HARD_BRICK_PERCENTAGE = 20
 # Sprites
 paddles = pygame.sprite.Group()
 balls = pygame.sprite.Group()
 bricks = pygame.sprite.Group()
 
 Paddle.PADDLE_HEIGHT = BRICK_HEIGHT
-paddle = Paddle((350, 450), 50, 400, BLUE)
+paddle = Paddle((350, 450), 1000, 400, BLUE)
 paddles.add(paddle)
-
-
 
 for row in range(8):
     for column in range(14):
         x = BRICK_BORDER + column * (BRICK_WIDTH + 2 * BRICK_MARGIN) + BRICK_MARGIN
         y = BRICK_TOP + row * (BRICK_HEIGHT + 2 * BRICK_MARGIN) + BRICK_MARGIN
-        brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
+        # brick = HardBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
+        # bricks.add(brick)
+        # Determine brick type based on random selection
+        if random.randint(1, 100) <= HARD_BRICK_PERCENTAGE:
+            # Create a HardBrick
+            brick = HardBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), HARD_BRICK_COLOR)
+        else:
+            # Create a regular Brick
+            # color = random.choice(ROW_COLORS[row])
+            brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
+            # brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), color)
+
+        # Add brick to the group
         bricks.add(brick)
 
 for brick in bricks:
     brick.init_neighbours(bricks)
 
-
 # Counters
-score = Counter((10,10), "squarefont.ttf", 80, WHITE)
-lives = Counter((360,10), "squarefont.ttf", 80, WHITE)
+score = Counter((10, 10), "squarefont.ttf", 80, WHITE)
+lives = Counter((360, 10), "squarefont.ttf", 80, WHITE)
 lives.set_value(5)
 
 # Background
@@ -77,12 +90,13 @@ background = pygame.Surface(screen.get_rect().size)
 background.fill(BLACK)
 
 # Music
-
 pygame.mixer.music.load("breakout-music.ogg")
 pygame.mixer.music.play(-1)
 
+pygame.mixer.music.set_volume(0.1)
+
 # Flag for sound effect mute
-muted = False
+muted = True
 
 # Game loop
 running = True
@@ -98,9 +112,9 @@ while running:
                 # Only start a ball if there is none
                 if not len(balls):
                     # We start a new ball at the center of the paddle
-                    ball = Ball(paddle.rect.midtop, WHITE, pygame.Rect(0, 90, 700, 410), bricks, paddle)
+                    ball = Ball(paddle.rect.midtop, PINK, pygame.Rect(0, 90, 700, 410), bricks, paddle)
                     balls.add(ball)
-                    ball.start(400, random.randint(-135, -45))
+                    ball.start(600, random.randint(-135, -45))
             if event.key == pygame.K_m:
                 if pygame.mixer.music.get_busy():
                     pygame.mixer.music.stop()
@@ -121,7 +135,7 @@ while running:
     bricks.update(dt)
 
     # Draw
-    screen.blit(background, (0,0))
+    screen.blit(background, (0, 0))
     paddles.draw(screen)
     bricks.draw(screen)
     balls.draw(screen)
@@ -140,7 +154,7 @@ while running:
 
     # Display new frame
     pygame.display.flip()
-    
+
     # Calculate delta time
     dt = clock.tick(FPS) / 1000
 

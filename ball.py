@@ -1,16 +1,13 @@
 import pygame
 import settings
-#Test
-class Ball(pygame.sprite.Sprite):
 
-    BALL_SIZE = 7
+
+class Ball(pygame.sprite.Sprite):
+    BALL_SIZE = 15
     BALL_LOST = pygame.event.custom_type()
 
     def __init__(self, position, color, border: pygame.Rect, bricks: pygame.sprite.Group, paddle):
         super().__init__()
-
-        # Set the image and rect for the position
-        # No unneccessary book keeping, positon and size are stored in the rect
         self.image = pygame.Surface((Ball.BALL_SIZE, Ball.BALL_SIZE))
         self.rect = self.image.get_rect()
         pygame.draw.rect(self.image, color, self.rect)
@@ -26,12 +23,11 @@ class Ball(pygame.sprite.Sprite):
         # we store direction and speed as velocity vector
         # this is more efficient for the calculation of the
         # position changes in each frame
-        self.velocity = pygame.Vector2(0,0)
+        self.velocity = pygame.Vector2(0, 0)
 
         # Bounce sound
         self.bounce = pygame.mixer.Sound("bounce.wav")
         self.bounce.set_volume(0.5)
-
 
     def update(self, dt):
         # Old position to check for any collisions between old and new
@@ -51,7 +47,7 @@ class Ball(pygame.sprite.Sprite):
         distance = 10000
         origin = pygame.Vector2(old.center)
         for brick in colliding_bricks:
-            clipped_line =  brick.rect.clipline(old.center, self.rect.center)
+            clipped_line = brick.rect.clipline(old.center, self.rect.center)
             if clipped_line:
                 start, end = clipped_line
                 d = origin.distance_squared_to(start)
@@ -84,7 +80,7 @@ class Ball(pygame.sprite.Sprite):
         # First check if we are below the paddle surface
         if self.rect.centery > self.paddle.rect.top:
             # if so, check, if we crossed the paddle
-            clipped_line =  self.paddle.rect.clipline(old.center, self.rect.center)
+            clipped_line = self.paddle.rect.clipline(old.center, self.rect.center)
             if clipped_line:
                 start, end = clipped_line
                 # if so, check if we hit it the ball with the paddle top
@@ -111,7 +107,7 @@ class Ball(pygame.sprite.Sprite):
             else:
                 self.velocity.y *= -1
             # Set ball back to where it left
-            clipped_line =  self.border.clipline(origin, self.rect.center)
+            clipped_line = self.border.clipline(origin, self.rect.center)
             if not clipped_line:
                 # If the ball starts exactly at the border,
                 # there is no clipped line.
@@ -120,7 +116,6 @@ class Ball(pygame.sprite.Sprite):
             else:
                 self.rect.center = clipped_line[1]
 
-
     def start(self, speed, direction):
         # A normalized vector in direction 0 (to the right)
         self.velocity = pygame.Vector2(1, 0)
@@ -128,7 +123,3 @@ class Ball(pygame.sprite.Sprite):
         self.velocity.rotate_ip(direction)
         # Set the correct speed
         self.velocity *= speed
-
-
-
-
