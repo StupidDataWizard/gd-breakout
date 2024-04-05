@@ -93,7 +93,7 @@ background.fill(BLACK)
 pygame.mixer.music.load("breakout-music.ogg")
 pygame.mixer.music.play(-1)
 
-pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.set_volume(0.5)
 
 # Flag for sound effect mute
 muted = True
