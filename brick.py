@@ -74,8 +74,8 @@ class HardBrick(Brick):
         super().__init__(position, size, color)
         self.value = 1
         self.hit_count = 2
-        PINK = pygame.Color("hotpink4")
-        self.color = PINK
+        #PINK = pygame.Color("hotpink4")
+        #self.color = PINK
 
     def hit(self):
         if not settings.sfx_muted:

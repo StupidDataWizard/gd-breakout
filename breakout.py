@@ -24,10 +24,11 @@ BLACK = pygame.Color("black")
 WHITE = pygame.Color("snow")
 RED = pygame.Color("red4")
 ORANGE = pygame.Color("coral")
-GREEN = pygame.Color("green")
+GREEN = pygame.Color("green4")
 YELLOW = pygame.Color("yellow")
 BLUE = pygame.Color("skyblue1")
 PINK = pygame.Color("hotpink4")
+GREY = pygame.Color("grey50")
 
 # Fonts
 MESSAGE_FONT = pygame.font.Font("squarefont.ttf", 50)
@@ -47,8 +48,8 @@ BRICK_TOP = 100
 
 ROW_COLORS = [RED, RED, ORANGE, ORANGE, GREEN, GREEN, YELLOW, YELLOW]
 
-HARD_BRICK_COLOR = PINK
-HARD_BRICK_PERCENTAGE = 20
+HARD_BRICK_COLOR = GREY
+# HARD_BRICK_PERCENTAGE = 20
 # Sprites
 paddles = pygame.sprite.Group()
 balls = pygame.sprite.Group()
@@ -57,26 +58,42 @@ bricks = pygame.sprite.Group()
 Paddle.PADDLE_HEIGHT = BRICK_HEIGHT
 paddle = Paddle((350, 450), 1000, 400, BLUE)
 paddles.add(paddle)
-
+'''
 for row in range(8):
     for column in range(14):
         x = BRICK_BORDER + column * (BRICK_WIDTH + 2 * BRICK_MARGIN) + BRICK_MARGIN
         y = BRICK_TOP + row * (BRICK_HEIGHT + 2 * BRICK_MARGIN) + BRICK_MARGIN
-        # brick = HardBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
-        # bricks.add(brick)
-        # Determine brick type based on random selection
         if random.randint(1, 100) <= HARD_BRICK_PERCENTAGE:
-            # Create a HardBrick
             brick = HardBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), HARD_BRICK_COLOR)
         else:
-            # Create a regular Brick
-            # color = random.choice(ROW_COLORS[row])
             brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
-            # brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), color)
 
         # Add brick to the group
         bricks.add(brick)
+'''
+N_ROWS = 8
+N_COLUMNS = 14
+TOTAL_BRICKS = N_ROWS * N_COLUMNS
+HARD_BRICK_PERCENTAGE = 0.2
 
+n_hard_bricks = int(TOTAL_BRICKS * HARD_BRICK_PERCENTAGE)
+brick_types = []
+
+for i in range(n_hard_bricks):
+    brick_types.append('hard')
+brick_types.extend(['normal'] * (TOTAL_BRICKS - n_hard_bricks))
+random.shuffle(brick_types)
+index = 0
+for row in range(N_ROWS):
+    for column in range(N_COLUMNS):
+        x = BRICK_BORDER + column * (BRICK_WIDTH + 2 * BRICK_MARGIN) + BRICK_MARGIN
+        y = BRICK_TOP + row * (BRICK_HEIGHT + 2 * BRICK_MARGIN) + BRICK_MARGIN
+        if brick_types[index] == 'hard':
+            brick = HardBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), HARD_BRICK_COLOR)
+        else:
+            brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
+        index += 1
+        bricks.add(brick)
 for brick in bricks:
     brick.init_neighbours(bricks)
 
