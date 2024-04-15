@@ -86,3 +86,21 @@ class HardBrick(Brick):
             self.kill()
             event = pygame.event.Event(Brick.BRICK_DESTROYED, value=self.value)
             pygame.event.post(event)
+
+
+class SpecialBrick(Brick):
+    SPAWN_BALL = pygame.event.custom_type()
+
+    def __init__(self, position, size, color):
+        super().__init__(position, size, color)
+        self.value = 5
+
+    def hit(self):
+        if not settings.sfx_muted:
+            self.hit_sound.play()
+        self.clear_neighbours()
+        self.kill()
+        event = pygame.event.Event(Brick.BRICK_DESTROYED, value=self.value)
+        pygame.event.post(event)
+        event = pygame.event.Event(SpecialBrick.SPAWN_BALL, position=self.rect.center)
+        pygame.event.post(event)
