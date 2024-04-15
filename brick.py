@@ -23,8 +23,8 @@ class Brick(pygame.sprite.Sprite):
         # Bounce sound
         self.hit_sound = pygame.mixer.Sound("explosion.wav")
         self.hit_sound.set_volume(0.5)
-    # JN: Collision Handling
 
+    # JN: Collision Handling
     def init_neighbours(self, bricks):
         collidepoints = {
             "top": (self.rect.centerx, self.rect.top - 2),
@@ -74,8 +74,8 @@ class HardBrick(Brick):
         super().__init__(position, size, color)
         self.value = 1
         self.hit_count = 2
-        #PINK = pygame.Color("hotpink4")
-        #self.color = PINK
+        # PINK = pygame.Color("hotpink4")
+        # self.color = PINK
 
     def hit(self):
         if not settings.sfx_muted:

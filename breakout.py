@@ -2,7 +2,7 @@ import pygame
 import random
 import settings
 from paddle import Paddle
-from brick import Brick, HardBrick
+from brick import Brick, HardBrick, SpecialBrick
 from ball import Ball
 from counter import Counter
 
@@ -49,6 +49,7 @@ BRICK_TOP = 100
 ROW_COLORS = [RED, RED, ORANGE, ORANGE, GREEN, GREEN, YELLOW, YELLOW]
 
 HARD_BRICK_COLOR = GREY
+SPECIAL_BRICK_COLOR = PINK
 # HARD_BRICK_PERCENTAGE = 20
 # Sprites
 paddles = pygame.sprite.Group()
@@ -83,6 +84,8 @@ for i in range(n_hard_bricks):
     brick_types.append('hard')
 brick_types.extend(['normal'] * (TOTAL_BRICKS - n_hard_bricks))
 random.shuffle(brick_types)
+brick_types[random.randint(-14, -1)] = "special"
+
 index = 0
 for row in range(N_ROWS):
     for column in range(N_COLUMNS):
@@ -90,8 +93,10 @@ for row in range(N_ROWS):
         y = BRICK_TOP + row * (BRICK_HEIGHT + 2 * BRICK_MARGIN) + BRICK_MARGIN
         if brick_types[index] == 'hard':
             brick = HardBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), HARD_BRICK_COLOR)
-        else:
+        elif brick_types[index] == 'normal':
             brick = Brick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), ROW_COLORS[row])
+        elif brick_types[index] == 'special':
+            brick = SpecialBrick((x, y), (BRICK_WIDTH, BRICK_HEIGHT), SPECIAL_BRICK_COLOR)
         index += 1
         bricks.add(brick)
 for brick in bricks:
@@ -139,6 +144,11 @@ while running:
                     pygame.mixer.music.play()
             if event.key == pygame.K_n:
                 settings.sfx_muted = not settings.sfx_muted
+        elif event.type == SpecialBrick.SPAWN_BALL:
+            position = event.position
+            new_ball = Ball(position, PINK, pygame.Rect(0, 90, 700, 410), bricks, paddle)
+            balls.add(new_ball)
+            new_ball.start(600, random.randint(-135, -45))
         elif event.type == Brick.BRICK_DESTROYED:
             score.change_value(event.value)
         elif event.type == Ball.BALL_LOST:
