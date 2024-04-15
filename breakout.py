@@ -5,6 +5,7 @@ from brick import Brick, HardBrick, SpecialBrick
 from ball import Ball
 from counter import Counter
 from settings import *
+from level import Level
 
 
 def initialize():
@@ -36,7 +37,7 @@ def initialize():
     pygame.mixer.music.set_volume(0.1)
 
     return screen, clock, FPS, BLACK, WHITE, RED, ORANGE, GREEN, YELLOW, BLUE, PINK, GREY, MESSAGE_FONT, INSTRUCTION_FONT, start_message, control_message, music_message, fx_message
-
+'''
 def generate_level_layout(total_bricks, hard_brick_percentage):
     n_hard_bricks = int(total_bricks * hard_brick_percentage)
     brick_types = ['hard'] * n_hard_bricks
@@ -44,7 +45,7 @@ def generate_level_layout(total_bricks, hard_brick_percentage):
     random.shuffle(brick_types)
     brick_types[random.randint(-14, -1)] = "special"
     return brick_types
-
+'''
 def build_brick_wall(bricks, brick_types, N_ROWS, N_COLUMNS, BRICK_BORDER, BRICK_WIDTH, BRICK_MARGIN, BRICK_HEIGHT, BRICK_TOP, ROW_COLORS, HARD_BRICK_COLOR, SPECIAL_BRICK_COLOR):
     index = 0
     for row in range(N_ROWS):
@@ -68,7 +69,7 @@ def update_game(dt, paddles, balls, bricks):
     balls.update(dt)
     bricks.update(dt)
 
-def draw_game(screen, background, paddles, bricks, balls, score, lives, start_message, control_message, music_message, fx_message):
+def draw_game(screen, background, paddles, bricks, balls, score, lives, start_message, control_message, music_message, fx_message, level):
     # Draw
     screen.blit(background, (0, 0))
     paddles.draw(screen)
@@ -76,9 +77,9 @@ def draw_game(screen, background, paddles, bricks, balls, score, lives, start_me
     balls.draw(screen)
     score.draw(screen)
     lives.draw(screen)
+    level.draw(screen)
 
 screen, clock, FPS, BLACK, WHITE, RED, ORANGE, GREEN, YELLOW, BLUE, PINK, GREY, MESSAGE_FONT, INSTRUCTION_FONT, start_message, control_message, music_message, fx_message = initialize()
-
 
 # Sprites
 paddles = pygame.sprite.Group()
@@ -86,7 +87,7 @@ balls = pygame.sprite.Group()
 bricks = pygame.sprite.Group()
 
 Paddle.PADDLE_HEIGHT = BRICK_HEIGHT
-paddle = Paddle((350, 450), 200, 400, BLUE)
+paddle = Paddle((350, 450), 1000, 400, BLUE)
 paddles.add(paddle)
 
 N_ROWS = 8
@@ -94,14 +95,18 @@ N_COLUMNS = 14
 TOTAL_BRICKS = N_ROWS * N_COLUMNS
 HARD_BRICK_PERCENTAGE = 0.2
 
-brick_types = generate_level_layout(TOTAL_BRICKS, HARD_BRICK_PERCENTAGE)
+levels = [Level(1, N_ROWS * N_COLUMNS, 0.2), Level(2, N_ROWS * N_COLUMNS, 0.3), Level(3, N_ROWS * N_COLUMNS, 0.4)]
+current_level = 0
 
+brick_types = levels[current_level].generate_level_layout()
 build_brick_wall(bricks, brick_types, N_ROWS, N_COLUMNS, BRICK_BORDER, BRICK_WIDTH, BRICK_MARGIN, BRICK_HEIGHT, BRICK_TOP, ROW_COLORS, HARD_BRICK_COLOR, SPECIAL_BRICK_COLOR)
 
 # Counters
 score = Counter((10, 10), "squarefont.ttf", 80, WHITE)
 lives = Counter((360, 10), "squarefont.ttf", 80, WHITE)
 lives.set_value(5)
+level = Counter((600, 10), "squarefont.ttf", 80, WHITE)
+level.set_value(current_level + 1)
 
 # Background
 background = pygame.Surface(screen.get_rect().size)
@@ -148,8 +153,21 @@ while running:
                     running = False
 
     update_game(dt, paddles, balls, bricks)
+    # Check if all bricks are destroyed
+    if len(bricks) == 0:  # All bricks were destroyed
+        print(f"You've completed level {current_level + 1}!")
+        current_level += 1
+        if current_level < len(levels):
+            brick_types = levels[current_level].generate_level_layout()
+            build_brick_wall(bricks, brick_types, N_ROWS, N_COLUMNS, BRICK_BORDER, BRICK_WIDTH, BRICK_MARGIN,
+                             BRICK_HEIGHT, BRICK_TOP, ROW_COLORS, HARD_BRICK_COLOR, SPECIAL_BRICK_COLOR)
+            # Update level counter
+            level.set_value(current_level + 1)
+        else:
+            print("You've completed all levels!")
+            running = False  # End the game
     draw_game(screen, background, paddles, bricks, balls, score, lives, start_message, control_message, music_message,
-              fx_message)
+              fx_message, level)
 
     # Show start message if there is no ball
     if not len(balls):

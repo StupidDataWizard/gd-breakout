@@ -12,7 +12,8 @@ class Counter():
 
     def set_value(self, value):
         self._value = value
-        number_format = "{{:0{}d}}".format(self.digits)
+        #number_format = "{{:0{}d}}".format(self.digits)
+        number_format = "{:d}"
         self.image = self.font.render(number_format.format(self._value), True, self.color)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.position

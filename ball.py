@@ -59,6 +59,8 @@ class Ball(pygame.sprite.Sprite):
         if closest:
             # Make point mutable
             point = list(point)
+            # Assign a default value to reflection
+            reflection = pygame.Vector2(1, 1)
             if point[1] == closest.rect.bottom - 1 and "bottom" not in closest.neighbours:
                 reflection = pygame.Vector2(1, -1)
                 # Move away from brick 1 pixel
